@@ -1,0 +1,24 @@
+{
+  "name": "pi-system-controls",
+  "version": "1.0.0",
+  "description": "Obsidian plugin providing Raspberry Pi system controls and UPS status",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "test": "tsc --noEmit"
+  },
+  "keywords": [
+    "obsidian",
+    "plugin",
+    "raspberry-pi"
+  ],
+  "author": "OpenAI ChatGPT",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "obsidian": "^1.5.8",
+    "typescript": "^5.9.2"
+  }
+}
