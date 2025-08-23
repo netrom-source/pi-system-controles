@@ -10,6 +10,8 @@ Obsidian plugin for Raspberry Pi systems that provides battery status for Wavesh
 - All controls are accessible through Obsidian hotkeys.
 - Ensures screen brightness never falls below 10%.
 
+> Battery status requires the `i2c-bus` module. If it isn't available, the plugin will still load but battery information will remain unknown.
+
 ## Development
 
 ```

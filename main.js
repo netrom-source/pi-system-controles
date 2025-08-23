@@ -32,15 +32,11 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const obsidian_1 = require("obsidian");
 const child_process_1 = require("child_process");
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
-const i2c_bus_1 = __importDefault(require("i2c-bus"));
 const DEFAULT_SETTINGS = {
     useSudo: false
 };
@@ -237,8 +233,16 @@ async function execAsync(cmd) {
     });
 }
 async function readBatteryInfo() {
+    let i2c;
     try {
-        const bus = await i2c_bus_1.default.openPromisified(1);
+        i2c = require('i2c-bus');
+    }
+    catch (e) {
+        console.error('i2c-bus module not found', e);
+        return null;
+    }
+    try {
+        const bus = await i2c.openPromisified(1);
         const buf = Buffer.alloc(4);
         await bus.readI2cBlock(0x2d, 0x0a, 4, buf);
         await bus.close();
