@@ -1,0 +1,10 @@
+{
+  "id": "pi-system-controls",
+  "name": "Pi System Controls",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "System controls and Waveshare UPS HAT (E) battery status for Raspberry Pi",
+  "author": "OpenAI ChatGPT",
+  "authorUrl": "https://www.waveshare.com/",
+  "isDesktopOnly": true
+}
