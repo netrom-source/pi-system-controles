@@ -1,12 +1,50 @@
-import { Plugin, PluginSettingTab, Setting, Notice } from 'obsidian';
-import { exec } from 'child_process';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import i2c from 'i2c-bus';
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const obsidian_1 = require("obsidian");
+const child_process_1 = require("child_process");
+const fs_1 = require("fs");
+const path = __importStar(require("path"));
+const i2c_bus_1 = __importDefault(require("i2c-bus"));
 const DEFAULT_SETTINGS = {
     useSudo: false
 };
-export default class PiSystemControlsPlugin extends Plugin {
+class PiSystemControlsPlugin extends obsidian_1.Plugin {
     constructor() {
         super(...arguments);
         this.settings = DEFAULT_SETTINGS;
@@ -141,15 +179,15 @@ export default class PiSystemControlsPlugin extends Plugin {
         if (!this.backlightPath) {
             this.backlightPath = await findBacklight();
             if (!this.backlightPath) {
-                new Notice('Ingen baggrundslys-enhed');
+                new obsidian_1.Notice('Ingen baggrundslys-enhed');
                 return;
             }
         }
-        const maxStr = await fs.readFile(path.join(this.backlightPath, 'max_brightness'), 'utf8');
+        const maxStr = await fs_1.promises.readFile(path.join(this.backlightPath, 'max_brightness'), 'utf8');
         const max = parseInt(maxStr.trim(), 10);
         const min = Math.round(max * 0.1);
         const value = Math.round((percent / 100) * (max - min) + min);
-        await fs.writeFile(path.join(this.backlightPath, 'brightness'), value.toString());
+        await fs_1.promises.writeFile(path.join(this.backlightPath, 'brightness'), value.toString());
     }
     async setRfkill(target, on) {
         const action = on ? 'unblock' : 'block';
@@ -157,10 +195,11 @@ export default class PiSystemControlsPlugin extends Plugin {
     }
     runCmd(cmd) {
         const full = this.settings.useSudo ? `sudo ${cmd}` : cmd;
-        exec(full);
+        (0, child_process_1.exec)(full);
     }
 }
-class PiSystemControlsSettingTab extends PluginSettingTab {
+exports.default = PiSystemControlsPlugin;
+class PiSystemControlsSettingTab extends obsidian_1.PluginSettingTab {
     constructor(app, plugin) {
         super(app, plugin);
         this.plugin = plugin;
@@ -168,7 +207,7 @@ class PiSystemControlsSettingTab extends PluginSettingTab {
     display() {
         const { containerEl } = this;
         containerEl.empty();
-        new Setting(containerEl)
+        new obsidian_1.Setting(containerEl)
             .setName('Use sudo for power commands')
             .addToggle(t => t.setValue(this.plugin.settings.useSudo)
             .onChange(async (value) => {
@@ -189,7 +228,7 @@ async function getRfkillState(target) {
 }
 async function execAsync(cmd) {
     return new Promise((resolve, reject) => {
-        exec(cmd, (error, stdout) => {
+        (0, child_process_1.exec)(cmd, (error, stdout) => {
             if (error)
                 reject(error);
             else
@@ -199,7 +238,7 @@ async function execAsync(cmd) {
 }
 async function readBatteryInfo() {
     try {
-        const bus = await i2c.openPromisified(1);
+        const bus = await i2c_bus_1.default.openPromisified(1);
         const buf = Buffer.alloc(4);
         await bus.readI2cBlock(0x2d, 0x0a, 4, buf);
         await bus.close();
@@ -223,7 +262,7 @@ function formatMinutes(mins) {
 }
 async function findBacklight() {
     try {
-        const entries = await fs.readdir('/sys/class/backlight');
+        const entries = await fs_1.promises.readdir('/sys/class/backlight');
         if (entries.length === 0)
             return null;
         return path.join('/sys/class/backlight', entries[0]);
@@ -238,8 +277,8 @@ async function getBrightness() {
     if (!backlight)
         return null;
     try {
-        const maxStr = await fs.readFile(path.join(backlight, 'max_brightness'), 'utf8');
-        const curStr = await fs.readFile(path.join(backlight, 'brightness'), 'utf8');
+        const maxStr = await fs_1.promises.readFile(path.join(backlight, 'max_brightness'), 'utf8');
+        const curStr = await fs_1.promises.readFile(path.join(backlight, 'brightness'), 'utf8');
         const max = parseInt(maxStr.trim(), 10);
         const cur = parseInt(curStr.trim(), 10);
         const min = Math.round(max * 0.1);
