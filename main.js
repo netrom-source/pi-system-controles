@@ -233,27 +233,18 @@ async function execAsync(cmd) {
     });
 }
 async function readBatteryInfo() {
-    let i2c;
     try {
-        i2c = require('i2c-bus');
+        const percentHex = await execAsync('i2cget -y 1 0x2d 0x0a');
+        const chargingHex = await execAsync('i2cget -y 1 0x2d 0x0b');
+        const minsLoHex = await execAsync('i2cget -y 1 0x2d 0x0c');
+        const minsHiHex = await execAsync('i2cget -y 1 0x2d 0x0d');
+        const percent = parseInt(percentHex, 16);
+        const charging = parseInt(chargingHex, 16) === 1;
+        const minutes = parseInt(minsLoHex, 16) | (parseInt(minsHiHex, 16) << 8);
+        return { percent, charging, minutes };
     }
     catch (e) {
-        console.error('i2c-bus module not found', e);
-        return null;
-    }
-    try {
-        const bus = await i2c.openPromisified(1);
-        const buf = Buffer.alloc(4);
-        await bus.readI2cBlock(0x2d, 0x0a, 4, buf);
-        await bus.close();
-        return {
-            percent: buf[0],
-            charging: buf[1] === 1,
-            minutes: buf[2] | (buf[3] << 8)
-        };
-    }
-    catch (e) {
-        console.error('i2c read failed', e);
+        console.error('i2cget failed', e);
         return null;
     }
 }
