@@ -15,11 +15,7 @@
   ],
   "author": "OpenAI ChatGPT",
   "license": "MIT",
-  "dependencies": {
-    "i2c-bus": "^5.2.2"
-  },
   "devDependencies": {
-    "@types/i2c-bus": "^5.1.1",
     "@types/node": "^20.11.30",
     "obsidian": "^1.5.8",
     "typescript": "^5.9.2"
