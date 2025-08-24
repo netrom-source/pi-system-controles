@@ -1,7 +1,7 @@
 .pi-system-menu {
   position: fixed;
   bottom: 30px;
-  right: 30px;
+  right: 0;
   background-color: var(--background-secondary);
   padding: 10px;
   border-radius: 8px;
@@ -26,4 +26,13 @@
 
 .pi-system-gear {
   cursor: pointer;
+  font-size: 1.2em;
+}
+
+.pi-power-row {
+  gap: 0.5em;
+}
+
+.pi-power-row button {
+  flex: 1;
 }
