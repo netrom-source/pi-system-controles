@@ -1,0 +1,29 @@
+.pi-system-menu {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: var(--background-secondary);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 10000;
+}
+
+.pi-system-menu.hidden {
+  display: none;
+}
+
+.pi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+.pi-row:last-child {
+  margin-bottom: 0;
+}
+
+.pi-system-gear {
+  cursor: pointer;
+}
