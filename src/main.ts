@@ -125,18 +125,16 @@ await this.setBrightness(val);
 };
 getBrightness().then(v => { if (v != null) brInput.value = v.toString(); });
 
-    // Reboot button
-    const rbRow = this.menuEl.createDiv({ cls: 'pi-row' });
-    const rbBtn = rbRow.createEl('button', { text: '↻' });
+    // Reboot and Shutdown buttons
+    const powerRow = this.menuEl.createDiv({ cls: 'pi-row pi-power-row' });
+    const rbBtn = powerRow.createEl('button', { text: '↻' });
     rbBtn.setAttribute('aria-label', 'Genstart');
     rbBtn.onclick = () => this.runCmd('systemctl reboot');
 
-    // Shutdown button
-    const sdRow = this.menuEl.createDiv({ cls: 'pi-row' });
-    const sdBtn = sdRow.createEl('button', { text: '⏻' });
+    const sdBtn = powerRow.createEl('button', { text: '⏻' });
     sdBtn.setAttribute('aria-label', 'Sluk');
     sdBtn.onclick = () => this.runCmd('systemctl poweroff');
-}
+  }
 
 toggleMenu() {
 if (!this.menuEl) return;
