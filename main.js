@@ -234,13 +234,24 @@ async function execAsync(cmd) {
 }
 async function readBatteryInfo() {
     try {
-        const percentHex = await execAsync('i2cget -y 1 0x2d 0x0a');
-        const chargingHex = await execAsync('i2cget -y 1 0x2d 0x0b');
-        const minsLoHex = await execAsync('i2cget -y 1 0x2d 0x0c');
-        const minsHiHex = await execAsync('i2cget -y 1 0x2d 0x0d');
-        const percent = parseInt(percentHex, 16);
-        const charging = parseInt(chargingHex, 16) === 1;
-        const minutes = parseInt(minsLoHex, 16) | (parseInt(minsHiHex, 16) << 8);
+        const [curLoHex, curHiHex, pctLoHex, pctHiHex, rteLoHex, rteHiHex, rtfLoHex, rtfHiHex] = await Promise.all([
+            execAsync('i2cget -y 1 0x2d 0x22'),
+            execAsync('i2cget -y 1 0x2d 0x23'),
+            execAsync('i2cget -y 1 0x2d 0x24'),
+            execAsync('i2cget -y 1 0x2d 0x25'),
+            execAsync('i2cget -y 1 0x2d 0x28'),
+            execAsync('i2cget -y 1 0x2d 0x29'),
+            execAsync('i2cget -y 1 0x2d 0x2a'),
+            execAsync('i2cget -y 1 0x2d 0x2b'),
+        ]);
+        const toInt = (hex) => parseInt(hex, 16);
+        const currentRaw = toInt(curLoHex) | (toInt(curHiHex) << 8);
+        const current = currentRaw > 0x7fff ? currentRaw - 0x10000 : currentRaw;
+        const charging = current > 0;
+        const percent = toInt(pctLoHex) | (toInt(pctHiHex) << 8);
+        const timeToEmpty = toInt(rteLoHex) | (toInt(rteHiHex) << 8);
+        const timeToFull = toInt(rtfLoHex) | (toInt(rtfHiHex) << 8);
+        const minutes = charging ? timeToFull : timeToEmpty;
         return { percent, charging, minutes };
     }
     catch (e) {
