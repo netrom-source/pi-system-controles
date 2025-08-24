@@ -107,21 +107,21 @@ class PiSystemControlsPlugin extends obsidian_1.Plugin {
         // Wi-Fi toggle
         const wifiRow = this.menuEl.createDiv({ cls: 'pi-row' });
         wifiRow.createSpan({ text: 'Wi-Fi' });
-        const wifiInput = wifiRow.createEl('input', { type: 'checkbox' });
-        wifiInput.onchange = async () => {
-            await this.setRfkill('wifi', wifiInput.checked);
-        };
+        const wifiToggle = new obsidian_1.ToggleComponent(wifiRow);
+        wifiToggle.onChange(async (value) => {
+            await this.setRfkill('wifi', value);
+        });
         getRfkillState('wifi').then(state => { if (state != null)
-            wifiInput.checked = state; });
+            wifiToggle.setValue(state); });
         // Bluetooth toggle
         const btRow = this.menuEl.createDiv({ cls: 'pi-row' });
         btRow.createSpan({ text: 'Bluetooth' });
-        const btInput = btRow.createEl('input', { type: 'checkbox' });
-        btInput.onchange = async () => {
-            await this.setRfkill('bluetooth', btInput.checked);
-        };
+        const btToggle = new obsidian_1.ToggleComponent(btRow);
+        btToggle.onChange(async (value) => {
+            await this.setRfkill('bluetooth', value);
+        });
         getRfkillState('bluetooth').then(state => { if (state != null)
-            btInput.checked = state; });
+            btToggle.setValue(state); });
         // Brightness slider
         const brRow = this.menuEl.createDiv({ cls: 'pi-row' });
         brRow.createSpan({ text: 'Lysstyrke' });
@@ -136,11 +136,13 @@ class PiSystemControlsPlugin extends obsidian_1.Plugin {
             brInput.value = v.toString(); });
         // Reboot button
         const rbRow = this.menuEl.createDiv({ cls: 'pi-row' });
-        const rbBtn = rbRow.createEl('button', { text: 'Genstart' });
+        const rbBtn = rbRow.createEl('button', { text: '↻' });
+        rbBtn.setAttribute('aria-label', 'Genstart');
         rbBtn.onclick = () => this.runCmd('systemctl reboot');
         // Shutdown button
         const sdRow = this.menuEl.createDiv({ cls: 'pi-row' });
-        const sdBtn = sdRow.createEl('button', { text: 'Sluk' });
+        const sdBtn = sdRow.createEl('button', { text: '⏻' });
+        sdBtn.setAttribute('aria-label', 'Sluk');
         sdBtn.onclick = () => this.runCmd('systemctl poweroff');
     }
     toggleMenu() {

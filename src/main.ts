@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting, Notice } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Notice, ToggleComponent } from 'obsidian';
 import { exec } from 'child_process';
 import { promises as fs } from 'fs';
 import * as path from 'path';
@@ -95,23 +95,23 @@ buildMenu() {
 this.menuEl = createDiv({ cls: 'pi-system-menu hidden' });
 document.body.appendChild(this.menuEl);
 
-// Wi-Fi toggle
-const wifiRow = this.menuEl.createDiv({ cls: 'pi-row' });
-wifiRow.createSpan({ text: 'Wi-Fi' });
-const wifiInput = wifiRow.createEl('input', { type: 'checkbox' });
-wifiInput.onchange = async () => {
-await this.setRfkill('wifi', wifiInput.checked);
-};
-getRfkillState('wifi').then(state => { if (state != null) wifiInput.checked = state; });
+    // Wi-Fi toggle
+    const wifiRow = this.menuEl.createDiv({ cls: 'pi-row' });
+    wifiRow.createSpan({ text: 'Wi-Fi' });
+    const wifiToggle = new ToggleComponent(wifiRow);
+    wifiToggle.onChange(async (value) => {
+      await this.setRfkill('wifi', value);
+    });
+    getRfkillState('wifi').then(state => { if (state != null) wifiToggle.setValue(state); });
 
-// Bluetooth toggle
-const btRow = this.menuEl.createDiv({ cls: 'pi-row' });
-btRow.createSpan({ text: 'Bluetooth' });
-const btInput = btRow.createEl('input', { type: 'checkbox' });
-btInput.onchange = async () => {
-await this.setRfkill('bluetooth', btInput.checked);
-};
-getRfkillState('bluetooth').then(state => { if (state != null) btInput.checked = state; });
+    // Bluetooth toggle
+    const btRow = this.menuEl.createDiv({ cls: 'pi-row' });
+    btRow.createSpan({ text: 'Bluetooth' });
+    const btToggle = new ToggleComponent(btRow);
+    btToggle.onChange(async (value) => {
+      await this.setRfkill('bluetooth', value);
+    });
+    getRfkillState('bluetooth').then(state => { if (state != null) btToggle.setValue(state); });
 
 // Brightness slider
 const brRow = this.menuEl.createDiv({ cls: 'pi-row' });
@@ -125,15 +125,17 @@ await this.setBrightness(val);
 };
 getBrightness().then(v => { if (v != null) brInput.value = v.toString(); });
 
-// Reboot button
-const rbRow = this.menuEl.createDiv({ cls: 'pi-row' });
-const rbBtn = rbRow.createEl('button', { text: 'Genstart' });
-rbBtn.onclick = () => this.runCmd('systemctl reboot');
+    // Reboot button
+    const rbRow = this.menuEl.createDiv({ cls: 'pi-row' });
+    const rbBtn = rbRow.createEl('button', { text: '↻' });
+    rbBtn.setAttribute('aria-label', 'Genstart');
+    rbBtn.onclick = () => this.runCmd('systemctl reboot');
 
-// Shutdown button
-const sdRow = this.menuEl.createDiv({ cls: 'pi-row' });
-const sdBtn = sdRow.createEl('button', { text: 'Sluk' });
-sdBtn.onclick = () => this.runCmd('systemctl poweroff');
+    // Shutdown button
+    const sdRow = this.menuEl.createDiv({ cls: 'pi-row' });
+    const sdBtn = sdRow.createEl('button', { text: '⏻' });
+    sdBtn.setAttribute('aria-label', 'Sluk');
+    sdBtn.onclick = () => this.runCmd('systemctl poweroff');
 }
 
 toggleMenu() {
